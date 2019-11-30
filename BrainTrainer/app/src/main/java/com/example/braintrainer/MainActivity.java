@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Button A, B, C, D;
     Button startButton;
     ConstraintLayout gameLayout;
+    Button playAgainButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,18 @@ public class MainActivity extends AppCompatActivity {
 
         gameLayout = findViewById(R.id.gameLayout);
         gameLayout.setVisibility(View.INVISIBLE);
+
+    }
+
+    public void playAgain() {
+        score = 0;
+        rounds = 0;
+        correctAnswerLocation = 0;
+        rightResult = 0;
+
+        nextQuestion();
+        playAgainButton.setVisibility(View.INVISIBLE);
+        resultText.setVisibility(View.INVISIBLE);
 
     }
 
@@ -108,10 +121,14 @@ public class MainActivity extends AppCompatActivity {
         gameLayout.setVisibility(View.VISIBLE);
         timerText = findViewById(R.id.secondsText);
         resultText = findViewById(R.id.resultTextView);
+        playAgainButton = findViewById(R.id.playAgainButton);
 
         nextQuestion();
+        createTimer();
+    }
 
-        CountDownTimer countDown = new CountDownTimer(30100, 1000) {
+    public  void createTimer() {
+        new CountDownTimer(30100, 1000) {
             @Override
             public void onTick(long l) {
                 timerText.setText(String.valueOf(l / 1000) + "s");
@@ -119,7 +136,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+
                 resultText.setText("KONIEC CZASU!");
+//                findViewById(R.id.gridLayout).setVisibility(View.INVISIBLE);
+//                calcText.setVisibility(View.INVISIBLE);
+                playAgainButton.setVisibility(View.VISIBLE);
             }
         };
     }
