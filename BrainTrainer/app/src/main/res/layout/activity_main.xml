@@ -17,13 +17,14 @@
 
         <androidx.gridlayout.widget.GridLayout
             android:id="@+id/gridLayout"
-            android:layout_width="325dp"
-            android:layout_height="384dp"
+            android:layout_width="327dp"
+            android:layout_height="285dp"
             android:layout_marginStart="43dp"
             android:layout_marginLeft="43dp"
             android:layout_marginTop="60dp"
             android:layout_marginEnd="43dp"
             android:layout_marginRight="43dp"
+            android:visibility="visible"
             app:columnCount="2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,7 +94,6 @@
             android:layout_marginTop="46dp"
             android:layout_marginEnd="152dp"
             android:layout_marginRight="152dp"
-            android:onClick="playAgain"
             android:text="RESULT"
             android:textSize="30sp"
             android:visibility="invisible"
@@ -103,21 +103,38 @@
 
         <Button
             android:id="@+id/playAgainButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="198dp"
+            android:layout_height="71dp"
             android:layout_marginStart="162dp"
             android:layout_marginLeft="162dp"
             android:layout_marginEnd="162dp"
             android:layout_marginRight="162dp"
-            android:layout_marginBottom="65dp"
             android:background="#E91E63"
+            android:onClick="playAgain"
             android:text="ZAGRAJ PONOWNIE"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/resultTextView" />
+
+        <TextView
+            android:id="@+id/scoreTextView"
+            android:layout_width="204dp"
+            android:layout_height="236dp"
+            android:layout_marginStart="163dp"
+            android:layout_marginLeft="163dp"
+            android:layout_marginTop="240dp"
+            android:layout_marginEnd="163dp"
+            android:layout_marginRight="163dp"
+            android:text="Twój wynik: 0"
+            android:textSize="30sp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.448"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/secondsText"
@@ -128,7 +145,7 @@
             android:layout_marginTop="25dp"
             android:background="#FFEB3B"
             android:padding="15dp"
-            android:text="20s"
+            android:text="30s"
             android:textColor="#050000"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="parent"

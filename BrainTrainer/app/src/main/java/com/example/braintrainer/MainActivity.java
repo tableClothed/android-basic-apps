@@ -29,12 +29,20 @@ public class MainActivity extends AppCompatActivity {
     Button startButton;
     ConstraintLayout gameLayout;
     Button playAgainButton;
+    TextView endScreenScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         calcText = findViewById(R.id.calculationText);
+        resultText = findViewById(R.id.resultTextView);
+        scoreView = findViewById(R.id.scoreText);
+        timerText = findViewById(R.id.secondsText);
+        resultText = findViewById(R.id.resultTextView);
+        playAgainButton = findViewById(R.id.playAgainButton);
+        endScreenScore = findViewById(R.id.scoreTextView);
+
 
         A = findViewById(R.id.buttonA);
         B = findViewById(R.id.buttonB);
@@ -47,18 +55,25 @@ public class MainActivity extends AppCompatActivity {
         gameLayout = findViewById(R.id.gameLayout);
         gameLayout.setVisibility(View.INVISIBLE);
 
+
     }
 
-    public void playAgain() {
+    public void playAgain(View view) {
         score = 0;
         rounds = 0;
         correctAnswerLocation = 0;
         rightResult = 0;
 
         nextQuestion();
+        createTimer();
+
         playAgainButton.setVisibility(View.INVISIBLE);
         resultText.setVisibility(View.INVISIBLE);
+        endScreenScore.setVisibility(View.INVISIBLE);
+        findViewById(R.id.gridLayout).setVisibility(View.VISIBLE);
+        calcText.setVisibility(View.VISIBLE);
 
+        scoreView.setText(Integer.toString(score) + "/" + Integer.toString(rounds));
     }
 
     private void nextQuestion() {
@@ -98,9 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chooseAnswer(View view) {
-        resultText = findViewById(R.id.resultTextView);
-        scoreView = findViewById(R.id.scoreText);
-        resultText.setVisibility(View.INVISIBLE);
+        resultText.setVisibility(View.VISIBLE);
 
         if (Integer.toString(correctAnswerLocation).equals(view.getTag().toString())) {
             resultText.setText("DOBRA ODPOWIEDŹ");
@@ -119,29 +132,32 @@ public class MainActivity extends AppCompatActivity {
 
         startButton.setVisibility(View.INVISIBLE);
         gameLayout.setVisibility(View.VISIBLE);
-        timerText = findViewById(R.id.secondsText);
-        resultText = findViewById(R.id.resultTextView);
-        playAgainButton = findViewById(R.id.playAgainButton);
 
         nextQuestion();
+
         createTimer();
     }
 
-    public  void createTimer() {
+    public  void  createTimer() {
         new CountDownTimer(30100, 1000) {
             @Override
             public void onTick(long l) {
-                timerText.setText(String.valueOf(l / 1000) + "s");
+                String val = String.valueOf(l / 1000);
+
+                timerText.setText(val + "s");
             }
 
             @Override
             public void onFinish() {
 
                 resultText.setText("KONIEC CZASU!");
-//                findViewById(R.id.gridLayout).setVisibility(View.INVISIBLE);
-//                calcText.setVisibility(View.INVISIBLE);
+                findViewById(R.id.gridLayout).setVisibility(View.INVISIBLE);
+                calcText.setVisibility(View.INVISIBLE);
                 playAgainButton.setVisibility(View.VISIBLE);
+                endScreenScore.setVisibility(View.VISIBLE);
+                endScreenScore.setText("Twój wynik:" + Integer.toString(score));
             }
-        };
+        }.start();
     }
+
 }
