@@ -70,9 +70,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            }
+            startListening();
         }
     }
 
@@ -84,13 +82,13 @@ public class MainActivity extends AppCompatActivity {
 
     public  void  updateLocationInfo(Location location) {
         TextView latTextView = findViewById(R.id.latitudeText);
-        TextView longtitude = findViewById(R.id.longtitudeText);
+        TextView longitude = findViewById(R.id.longtitudeText);
         TextView accuracy = findViewById(R.id.accuraccyText);
         TextView addressText = findViewById(R.id.addressText);
         TextView altitude = findViewById(R.id.altitudeText);
 
         latTextView.setText("Latitude: " + Double.toString(location.getLatitude()));
-        longtitude.setText("Longtitude: " + Double.toString(location.getLongitude()));
+        longitude.setText("Longitude: " + Double.toString(location.getLongitude()));
         accuracy.setText("Accuracy: " + Double.toString(location.getAccuracy()));
         altitude.setText("Altitude: " + Double.toString(location.getAltitude()));
 

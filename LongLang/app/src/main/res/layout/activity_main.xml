@@ -38,7 +38,7 @@
         android:layout_width="325dp"
         android:layout_height="45dp"
         android:layout_marginTop="70dp"
-        android:text="Longtitude: 40.0000"
+        android:text="Longitude: 40.0000"
         android:textColor="#FFFFFF"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
