@@ -5,14 +5,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
+import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -21,14 +27,21 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     TextView loginText;
     Boolean signUpModeActive = false;
+    EditText email;
+    EditText password;
+
+    public void showUserList() {
+        Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
+        startActivity(intent);
+    }
 
     public void signIn(View view) {
-        EditText email = findViewById(R.id.emailText);
-        EditText password = findViewById(R.id.passwordText);
+        email = findViewById(R.id.emailText);
+        password = findViewById(R.id.passwordText);
 
         if (email.getText().toString().matches("") || password.getText().toString().matches("")) {
             Toast.makeText(this, "Password and email are required", Toast.LENGTH_SHORT);
@@ -44,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void done(ParseException e) {
                         if (e == null) {
                             Log.i("Signup", "Success");
+                            showUserList();
                         } else {
                             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -55,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void done(ParseUser user, ParseException e) {
                         if (user != null ) {
                             Log.i("Login", "ok!");
+                            showUserList();
                         } else {
                             e.printStackTrace();
                         }
@@ -72,34 +87,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loginText = findViewById(R.id.loginText);
         loginText.setOnClickListener(this);
+        password.setOnKeyListener(this);
+        ImageView instImg = findViewById(R.id.instImg);
+        LinearLayout backgroundLayout = findViewById(R.id.relativeLayout);
+        instImg.setOnClickListener(this);
+        backgroundLayout.setOnClickListener(this);
 
-
-//        ParseObject score = new ParseObject("Score");
-//        score.put("username", "nick");
-//        score.put("score", 45);
-//        score.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                if (e == null) {
-//                    Log.i("success", "we sved the score");
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery("Score");
-//
-//        query.getInBackground("jfOvID0yXp", new GetCallback<ParseObject>() {
-//            @Override
-//            public void done(ParseObject object, ParseException e) {
-//                if (e == null && object != null) {
-//                    object.put("score", 85);
-//                    object.saveInBackground();
-//                }
-//            }
-//        });
-
+        if (ParseUser.getCurrentUser() != null) {
+            showUserList();
+        }
         ParseAnalytics.trackAppOpenedInBackground(new Intent());
 
     }
@@ -119,6 +115,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 loginText.setText("or, Login?");
 
             }
+        } else if (view.getId() == R.id.instImg || view.getId() == R.id.relativeLayout) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+            signIn(v);
+        }
+        return false;
     }
 }
