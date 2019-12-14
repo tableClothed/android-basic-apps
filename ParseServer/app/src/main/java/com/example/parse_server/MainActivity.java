@@ -30,7 +30,7 @@ import com.parse.SignUpCallback;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     TextView loginText;
-    Boolean signUpModeActive = false;
+    Boolean signUpModeActive = true;
     EditText email;
     EditText password;
 
@@ -39,12 +39,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    public void signIn(View view) {
-        email = findViewById(R.id.emailText);
-        password = findViewById(R.id.passwordText);
+    public void signUpClicked(View view) {
 
         if (email.getText().toString().matches("") || password.getText().toString().matches("")) {
-            Toast.makeText(this, "Password and email are required", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Password and email are required", Toast.LENGTH_SHORT).show();
 
         } else {
             if (signUpModeActive) {
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
             } else {
+                // Login
                 ParseUser.logInInBackground(email.getText().toString(), password.getText().toString(), new LogInCallback() {
                     @Override
                     public void done(ParseUser user, ParseException e) {
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Log.i("Login", "ok!");
                             showUserList();
                         } else {
-                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -85,6 +84,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTitle("Instagram");
+
+        email = findViewById(R.id.emailText);
+        password = findViewById(R.id.passwordText);
+
         loginText = findViewById(R.id.loginText);
         loginText.setOnClickListener(this);
         password.setOnKeyListener(this);
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ParseUser.getCurrentUser() != null) {
             showUserList();
         }
-        ParseAnalytics.trackAppOpenedInBackground(new Intent());
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
     }
 
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-            signIn(v);
+            signUpClicked(v);
         }
         return false;
     }
