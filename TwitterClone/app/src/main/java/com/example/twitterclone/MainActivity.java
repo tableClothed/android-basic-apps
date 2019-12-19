@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setTitle("Twitter: Login");
-        redirectUser();
+        //redirectUser();
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
