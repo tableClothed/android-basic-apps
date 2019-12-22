@@ -16,6 +16,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,19 +36,22 @@ public class MainActivity extends AppCompatActivity {
                             login();
                         } else {
                             createUser(username, password);
-
                         }
                     }
                 });
 
     }
 
-    public void  createUser(String username, String password) {
+    public void  createUser(final String username, final String password) {
         firebaseAuth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            DatabaseReference fb = FirebaseDatabase.getInstance().getReference()
+                                    .child("users").child(task.getResult().getUser().getUid())
+                                    .child("email");
+                            fb.setValue(username);
                             login();
                         } else {
                             FirebaseAuthException e = (FirebaseAuthException )task.getException();
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         if (firebaseAuth.getCurrentUser() != null) {
-            login();
+            //login();
         }
     }
 

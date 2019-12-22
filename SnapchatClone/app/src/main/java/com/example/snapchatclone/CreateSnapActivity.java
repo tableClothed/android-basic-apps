@@ -41,17 +41,12 @@ public class CreateSnapActivity extends AppCompatActivity {
 
         createSnapImageView = findViewById(R.id.imageView);
         messageText = findViewById(R.id.receiverNameText);
-//
-//        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-//        } else {
-//            getPhoto();
-//        }
+
     }
 
     public void getPhoto() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
 
     public  void chooseImageClicked(View view) {
@@ -67,7 +62,7 @@ public class CreateSnapActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getPhoto();
             }
         }
@@ -88,7 +83,6 @@ public class CreateSnapActivity extends AppCompatActivity {
     }
 
     public  void  nextClicked(View view) {
-        // Get the data from an ImageView as bytes
         createSnapImageView.setDrawingCacheEnabled(true);
         createSnapImageView.buildDrawingCache();
         Bitmap bitmap = ((BitmapDrawable) createSnapImageView.getDrawable()).getBitmap();
@@ -96,9 +90,12 @@ public class CreateSnapActivity extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
-        StorageReference ref = FirebaseStorage.getInstance().getReference().child("images").child(imageName);
+        StorageReference ref = FirebaseStorage.getInstance().getReference()
+                .child("images").child(imageName);
 
         UploadTask uploadTask = ref.putBytes(data);
+
+
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -108,6 +105,12 @@ public class CreateSnapActivity extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 String downloadUrl = taskSnapshot.toString();
+
+                Intent intent = new Intent(CreateSnapActivity.this, ChooseUserActivity.class);
+                intent.putExtra("imageURL", downloadUrl);
+                intent.putExtra("imageName", imageName);
+                intent.putExtra("message", messageText.getText().toString());
+                startActivity(intent);
             }
         });
 
