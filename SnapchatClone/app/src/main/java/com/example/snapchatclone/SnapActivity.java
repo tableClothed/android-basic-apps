@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -26,6 +28,7 @@ public class SnapActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     ListView feedList;
     ArrayList<String> emails = new ArrayList<>();
+    ArrayList<DataSnapshot> snaps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +51,36 @@ public class SnapActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {}
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                int index = 0;
+                for (DataSnapshot snap : snaps) {
+                    if (snap.getKey() == dataSnapshot.getKey()){
+                        snaps.remove(index);
+                        emails.remove(index);
+                    }
+                    index++;
+                }
+                adapter.notifyDataSetChanged();
+            }
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {}
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {}
+        });
+
+        feedList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DataSnapshot snapshop = snaps.get(position);
+                Intent intent = new Intent(SnapActivity.this, ViewSnapActivity.class);
+
+                intent.putExtra("imageName", snapshop.child("imageName").getValue().toString());
+                intent.putExtra("imageURL", snapshop.child("imageURL").getValue().toString());
+                intent.putExtra("message", snapshop.child("message").getValue().toString());
+                intent.putExtra("snapKey", snapshop.getKey());
+
+                startActivity(intent);
+            }
         });
     }
 
