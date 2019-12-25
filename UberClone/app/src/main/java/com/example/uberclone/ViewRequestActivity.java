@@ -1,5 +1,6 @@
 package com.example.uberclone;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -60,7 +61,7 @@ public class ViewRequestActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (ContextCompat.checkSelfPermission(ViewRequestActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(ViewRequestActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                     Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -97,12 +98,13 @@ public class ViewRequestActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {}
         };
 
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
             if (lastKnownLocation != null) {
                 updateListView(lastKnownLocation);
@@ -112,10 +114,11 @@ public class ViewRequestActivity extends AppCompatActivity {
 
     public void updateListView(Location location) {
         if (location != null) {
-            requests.clear();
+            //requests.clear();
             ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Request");
             final ParseGeoPoint parseGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
             query.whereNear("location", parseGeoPoint);
+            query.whereDoesNotExist("driverUsername");
             query.setLimit(10);
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
@@ -131,7 +134,7 @@ public class ViewRequestActivity extends AppCompatActivity {
                                 if (requestLocation != null) {
                                     Double distanceInMiles = parseGeoPoint.distanceInMilesTo(requestLocation);
                                     Double distanceOneDP = (double) Math.round(distanceInMiles + 10)/10;
-                                    requests.add(distanceInMiles.toString() + " miles");
+                                    requests.add(distanceOneDP.toString() + " miles");
                                     requestLatitude.add(requestLocation.getLatitude());
                                     requestLongitude.add(requestLocation.getLongitude());
                                     usernames.add(obj.getString("username"));
@@ -139,7 +142,7 @@ public class ViewRequestActivity extends AppCompatActivity {
 
                             }
                         } else {
-                            requests.add("No action requests nearby");
+                            requests.add("No active requests nearby");
                         }
                         arrayAdapter.notifyDataSetChanged();
                     }
@@ -148,5 +151,21 @@ public class ViewRequestActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    updateListView(lastKnownLocation);
+                }
+
+            }
+        }
     }
 }

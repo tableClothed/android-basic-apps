@@ -1,17 +1,22 @@
 package com.example.uberclone;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -35,10 +40,40 @@ public class DriverLocationActivity extends FragmentActivity implements OnMapRea
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_location);
+        intent = getIntent();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        ConstraintLayout mapLayout = findViewById(R.id.layout);
+        mapLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                LatLng driverLocation = new LatLng(intent.getDoubleExtra("driverLatitude", 0), intent.getDoubleExtra("driverLongitude", 0));
+
+                LatLng requestLocation = new LatLng(intent.getDoubleExtra("requestLatitude", 0), intent.getDoubleExtra("requestLongitude", 0));
+
+                ArrayList<Marker> markers = new ArrayList<>();
+
+                markers.add(mMap.addMarker(new MarkerOptions().position(driverLocation).title("Your Location")));
+                markers.add(mMap.addMarker(new MarkerOptions().position(requestLocation).title("Request Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))));
+
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                for (Marker marker : markers) {
+                    builder.include(marker.getPosition());
+                }
+                LatLngBounds bounds = builder.build();
+
+                int padding = 60;
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                mMap.animateCamera(cu);
+            }
+        });
+
     }
 
     public void acceptRequest(View view) {
@@ -55,9 +90,8 @@ public class DriverLocationActivity extends FragmentActivity implements OnMapRea
                                 @Override
                                 public void done(ParseException e) {
                                     if (e == null) {
-                                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                                Uri.parse("https://maps.google.com/maps?saddr=" + getIntent().getDoubleExtra("driverLatitude", 0)) +
-                                                        getIntent().getDoubleExtra("driverLatitude", 0)) + getIntent().getDoubleExtra("driverLatitude", 0)) + getIntent().getDoubleExtra("driverLatitude", 0)));
+                                        Intent directionsIntent  = new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("http://maps.google.com/maps?saddr=" + intent.getDoubleExtra("driverLatitude", 0) + "," + intent.getDoubleExtra("driverLongitude", 0) + "&daddr=" + intent.getDoubleExtra("requestLatitude", 0) + "," + intent.getDoubleExtra("requestLongitude", 0)));
                                         startActivity(intent);
                                     }
                                 }
@@ -73,27 +107,6 @@ public class DriverLocationActivity extends FragmentActivity implements OnMapRea
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        Intent intent = getIntent();
-
-        LatLng driverLocation = new LatLng(intent.getDoubleExtra("driverLatitude", 0), intent.getDoubleExtra("driverLongitude", 0));
-
-        LatLng requestLocation = new LatLng(intent.getDoubleExtra("requestLatitude", 0), intent.getDoubleExtra("requestLongitude", 0));
-
-        ArrayList<Marker> markers = new ArrayList<>();
-
-        markers.add(mMap.addMarker(new MarkerOptions().position(driverLocation).title("Your Location")));
-        markers.add(mMap.addMarker(new MarkerOptions().position(requestLocation).title("Request Location")));
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (Marker marker : markers) {
-            builder.include(marker.getPosition());
-        }
-        LatLngBounds bounds = builder.build();
-
-        int padding = 30;
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-        googleMap.animateCamera(cu);
 
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(driverLocation));
     }

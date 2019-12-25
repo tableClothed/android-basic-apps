@@ -71,7 +71,7 @@ public class RiderActivity extends FragmentActivity implements OnMapReadyCallbac
                 }
             });
         } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -97,7 +97,7 @@ public class RiderActivity extends FragmentActivity implements OnMapReadyCallbac
         }
     }
 
-    public void lgout(View view) {
+    public void logout(View view) {
         ParseUser.logOut();
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -154,10 +154,7 @@ public class RiderActivity extends FragmentActivity implements OnMapReadyCallbac
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.clear();
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
-                mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
+                updateMap(location);
             }
 
             @Override
