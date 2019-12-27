@@ -2,6 +2,7 @@ package com.example.whatsappclone;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,12 @@ public class MainActivity extends AppCompatActivity {
     boolean loginMode;
     EditText passwordText;
 
+    public void redirectIfLoggedIn() {
+        if (ParseUser.getCurrentUser() != null) {
+            Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
+            startActivity(intent);
+        }
+    }
 
     public void toggleLogin(View view) {
         Button loginButton = findViewById(R.id.registerButton);
@@ -28,12 +35,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (loginMode) {
             loginMode = false;
-            loginButton.setText("Or login");
-            singinButton.setText("Register");
-        } else {
-            loginMode = true;
             loginButton.setText("Or register");
             singinButton.setText("Login");
+        } else {
+            loginMode = true;
+            loginButton.setText("Or login");
+            singinButton.setText("Register");
         }
     }
 
@@ -43,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseUser user, ParseException e) {
                     if (e == null) {
-
+                        redirectIfLoggedIn();
                     } else {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-
+                        redirectIfLoggedIn();
                     } else {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -72,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setTitle("WhatsApp Login");
+
+        redirectIfLoggedIn();
 
         usernameText = findViewById(R.id.usernameText);
         passwordText = findViewById(R.id.passwordText);
